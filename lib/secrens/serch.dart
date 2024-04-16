@@ -33,6 +33,7 @@ class _SearchingState extends State<Searching>
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
+          leading: Icon(Icons.abc),
           title: SizedBox(
             height: 35,
             child: TextField(

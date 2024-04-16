@@ -29,8 +29,11 @@ class Product {
   final String name;
   final double price;
   final String image;
+  int quantity;
+  bool selected;
 
-  Product(this.name, this.price, this.image);
+  Product(this.name, this.price, this.image,
+      {this.quantity = 1, this.selected = false});
 }
 
 List<List<Product>> productall = [

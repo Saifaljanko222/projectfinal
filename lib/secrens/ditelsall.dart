@@ -1,27 +1,24 @@
 import 'package:finalproject/model/Cart_Content.dart';
+import 'package:finalproject/model/viwehome.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
-class Details extends StatefulWidget {
-  final Map<String, dynamic> item;
-
-  Details(this.item);
+class Detailsall extends StatefulWidget {
+  Product items;
+  Detailsall(this.items);
 
   @override
-  State<Details> createState() => _DetailsState();
+  State<Detailsall> createState() => _DetailsState();
 }
 
-class _DetailsState extends State<Details> {
+class _DetailsState extends State<Detailsall> {
   bool isShowMore = true;
 
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartContent>(context);
-    String name = widget.item['name'];
-    double price = widget.item['price'];
-    String image = widget.item['image'];
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -33,7 +30,7 @@ class _DetailsState extends State<Details> {
               decoration: BoxDecoration(
                   color: Color.fromARGB(255, 224, 224, 224),
                   image: DecorationImage(
-                    image: NetworkImage(image),
+                    image: AssetImage(widget.items.image),
                   )),
               child: Padding(
                 padding: EdgeInsets.all(10),
@@ -85,12 +82,12 @@ class _DetailsState extends State<Details> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          name,
+                          widget.items.name,
                           style: TextStyle(
                               fontSize: 28, fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          "\$" + price.toString(),
+                          "\$" + widget.items.price.toString(),
                           style: TextStyle(fontSize: 25),
                         ),
                       ],

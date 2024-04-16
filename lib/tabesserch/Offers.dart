@@ -1,6 +1,9 @@
+import 'package:finalproject/model/Cart_Content.dart';
+import 'package:finalproject/model/database.dart';
 import 'package:finalproject/model/viwehome.dart';
-import 'package:finalproject/secrens/ditels.dart';
+import 'package:finalproject/secrens/ditelsall.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class offerspage extends StatefulWidget {
   const offerspage({super.key});
@@ -33,6 +36,8 @@ class _MyWidgetState extends State<offerspage>
 
   @override
   Widget build(BuildContext context) {
+    final cart = Provider.of<CartContent>(context);
+    final fave = Provider.of<favecontent>(context);
     return DefaultTabController(
       length: 3, // Number of tabs
       child: Scaffold(
@@ -73,8 +78,8 @@ class _MyWidgetState extends State<offerspage>
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    Details(productall[selectedindex][index])));
+                                builder: (context) => Detailsall(
+                                    productall[selectedindex][index])));
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2,
@@ -98,8 +103,19 @@ class _MyWidgetState extends State<offerspage>
                                 color: const Color.fromARGB(255, 121, 119, 119),
                                 size: 25,
                               ),
-                              onPressed: () {
-                                // Perform chat actions
+                              onPressed: () async {
+                                final selectedProduct = product[index];
+                                final favorite = {
+                                  'name': selectedProduct.name,
+                                  'price': selectedProduct.price,
+                                  'image': selectedProduct.image,
+                                };
+
+                                final dbHelper = DatabaseHelper();
+                                final insertedId =
+                                    await dbHelper.insertFavorite(favorite);
+                                print(insertedId);
+                                // fave.add(product[index]);
                               },
                             ),
                             Expanded(
@@ -148,7 +164,7 @@ class _MyWidgetState extends State<offerspage>
                                     size: 30,
                                   ),
                                   onPressed: () {
-                                    // Perform chat actions
+                                    cart.add(product[index]);
                                   },
                                 ),
                               ],

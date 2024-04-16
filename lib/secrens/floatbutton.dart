@@ -1,61 +1,117 @@
 import 'package:finalproject/model/Cart_Content.dart';
-import 'package:finalproject/model/database.dart';
 import 'package:finalproject/model/viwehome.dart';
+import 'package:finalproject/secrens/cart.dart';
 import 'package:finalproject/secrens/ditelsall.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class bestpage extends StatefulWidget {
-  const bestpage({super.key});
+class floatB extends StatefulWidget {
+  const floatB({super.key});
 
   @override
-  State<bestpage> createState() => _MyWidgetState();
+  State<floatB> createState() => _floatBState();
 }
 
-class _MyWidgetState extends State<bestpage>
-    with SingleTickerProviderStateMixin {
-  late final PageController pageController;
-
+class _floatBState extends State<floatB> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  List<String> cate = ["قطع غيار", "كمبيو", "المحرك", "صالة"];
   int selectedindex = 0;
 
   @override
   void initState() {
-    pageController = PageController(
-      initialPage: 0,
-      viewportFraction: 0.85,
-    );
-
     super.initState();
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
   void dispose() {
-    pageController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final cart = Provider.of<CartContent>(context);
-    final fave = Provider.of<favecontent>(context);
-    return DefaultTabController(
-      length: 3, // Number of tabs
-      child: Scaffold(
-        body: SingleChildScrollView(
-            child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 8,
+    final cartp = Provider.of<CartContent>(context);
+    final favep = Provider.of<favecontent>(context);
+    bool _isPressed = false;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'ALL CATEGORIS',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Badge(
+              backgroundColor: Colors.red,
+              label: Text(cartp.selectedProduct.length.toString()),
+              largeSize: 20,
+              child: Icon(
+                Icons.shopping_cart,
+                color:
+                    _isPressed ? Colors.white : Color.fromARGB(255, 57, 57, 57),
+              ),
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              child: Text(
-                "Tap categrois",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: const Color.fromARGB(255, 121, 119, 119)),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      cart(), // Replace CartPage with your actual cart page widget
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Text(
+              "التصنيفات",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+            ),
+            SizedBox(
+              height: 50,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                itemCount: cate.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedindex = index;
+                      });
+                    },
+                    child: Container(
+                      height: 40,
+                      margin: EdgeInsets.all(8),
+                      padding: EdgeInsets.only(left: 15, right: 15),
+                      decoration: BoxDecoration(
+                        color: selectedindex == index
+                            ? const Color.fromARGB(255, 121, 119, 119)
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Center(
+                        child: Text(
+                          cate[index],
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: selectedindex == index
+                                ? Colors.white
+                                : Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
             SingleChildScrollView(
@@ -68,10 +124,10 @@ class _MyWidgetState extends State<bestpage>
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     childAspectRatio: (100 / 140),
-                    crossAxisSpacing: 20,
+                    crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
                   ),
-                  itemCount: product.length,
+                  itemCount: products[selectedindex].length,
                   itemBuilder: (BuildContext context, int index) {
                     return InkWell(
                       onTap: () {
@@ -79,7 +135,7 @@ class _MyWidgetState extends State<bestpage>
                             context,
                             MaterialPageRoute(
                                 builder: (context) => Detailsall(
-                                    productall[selectedindex][index])));
+                                    products[selectedindex][index])));
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2,
@@ -103,19 +159,8 @@ class _MyWidgetState extends State<bestpage>
                                 color: const Color.fromARGB(255, 121, 119, 119),
                                 size: 25,
                               ),
-                              onPressed: () async {
-                                final selectedProduct = product[index];
-                                final favorite = {
-                                  'name': selectedProduct.name,
-                                  'price': selectedProduct.price,
-                                  'image': selectedProduct.image,
-                                };
-
-                                final dbHelper = DatabaseHelper();
-                                final insertedId =
-                                    await dbHelper.insertFavorite(favorite);
-                                print(insertedId);
-                                // fave.add(product[index]);
+                              onPressed: () {
+                                favep.add(products[selectedindex][index]);
                               },
                             ),
                             Expanded(
@@ -124,7 +169,7 @@ class _MyWidgetState extends State<bestpage>
                                   borderRadius: BorderRadius.circular(15),
                                   image: DecorationImage(
                                     image: AssetImage(
-                                      product[index].image,
+                                      products[selectedindex][index].image,
                                     ),
                                     // fit: BoxFit.cover,
                                   ),
@@ -134,7 +179,7 @@ class _MyWidgetState extends State<bestpage>
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                product[index].name,
+                                products[selectedindex][index].name,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -148,7 +193,7 @@ class _MyWidgetState extends State<bestpage>
                                   padding: const EdgeInsets.only(
                                       left: 8.0, right: 8.0, bottom: 8.0),
                                   child: Text(
-                                    "\$${product[index].price}",
+                                    "\$${products[selectedindex][index].price}",
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
@@ -164,7 +209,7 @@ class _MyWidgetState extends State<bestpage>
                                     size: 30,
                                   ),
                                   onPressed: () {
-                                    cart.add(product[index]);
+                                    cartp.add(products[selectedindex][index]);
                                   },
                                 ),
                               ],
@@ -178,7 +223,7 @@ class _MyWidgetState extends State<bestpage>
               ),
             ),
           ],
-        )),
+        ),
       ),
     );
   }

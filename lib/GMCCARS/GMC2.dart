@@ -1,5 +1,8 @@
+import 'package:finalproject/model/Cart_Content.dart';
 import 'package:finalproject/model/viwehome.dart';
+import 'package:finalproject/secrens/cart.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class GMC2 extends StatefulWidget {
   const GMC2({super.key});
@@ -27,6 +30,9 @@ class _GMCPAGEState extends State<GMC2> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final cartp = Provider.of<CartContent>(context);
+    final fave = Provider.of<favecontent>(context);
+    bool _isPressed = false;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -39,13 +45,24 @@ class _GMCPAGEState extends State<GMC2> with SingleTickerProviderStateMixin {
         ),
         actions: [
           IconButton(
-            icon: Icon(
-              Icons.messenger,
-              color: Colors.grey,
-              size: 30,
+            icon: Badge(
+              backgroundColor: Colors.red,
+              label: Text(cartp.selectedProduct.length.toString()),
+              largeSize: 20,
+              child: Icon(
+                Icons.shopping_cart,
+                color:
+                    _isPressed ? Colors.white : Color.fromARGB(255, 57, 57, 57),
+              ),
             ),
             onPressed: () {
-              // Perform chat actions
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      cart(), // Replace CartPage with your actual cart page widget
+                ),
+              );
             },
           ),
         ],
@@ -112,7 +129,13 @@ class _GMCPAGEState extends State<GMC2> with SingleTickerProviderStateMixin {
                   itemCount: products[selectedindex].length,
                   itemBuilder: (BuildContext context, int index) {
                     return InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) =>
+                        //             Details(products[selectedindex][index])));
+                      },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2,
                         decoration: BoxDecoration(
@@ -129,6 +152,16 @@ class _GMCPAGEState extends State<GMC2> with SingleTickerProviderStateMixin {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.favorite,
+                                color: const Color.fromARGB(255, 121, 119, 119),
+                                size: 25,
+                              ),
+                              onPressed: () {
+                                fave.add(productall[selectedindex][index]);
+                              },
+                            ),
                             Expanded(
                               child: Container(
                                 decoration: BoxDecoration(
@@ -152,17 +185,33 @@ class _GMCPAGEState extends State<GMC2> with SingleTickerProviderStateMixin {
                                 ),
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 8.0, right: 8.0, bottom: 8.0),
-                              child: Text(
-                                "\$${products[selectedindex][index].price}",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.blue,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0, bottom: 8.0),
+                                  child: Text(
+                                    "\$${products[selectedindex][index].price}",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.add,
+                                    color: const Color.fromARGB(
+                                        255, 121, 119, 119),
+                                    size: 30,
+                                  ),
+                                  onPressed: () {
+                                    cartp.add(products[selectedindex][index]);
+                                  },
+                                ),
+                              ],
                             ),
                           ],
                         ),
